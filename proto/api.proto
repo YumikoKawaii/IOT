@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package iot.api.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "iot/api/v1;api";
+
+// IOTService ...
+service IOTService {
+  // Will develop this after get some knowledge about google authentication
+//  rpc Authenticate(AuthenticationRequest) returns (AuthenticationResponse) {
+//    option (google.api.http) = {
+//      post: "/api/yumiko/authen"
+//      body: "*"
+//    };
+//  }
+
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/yumiko/account/register"
+      body: "*"
+    };
+  }
+
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/yumiko/account/login"
+      body: "*"
+    };
+  }
+
+  rpc Control(ControlRequest) returns (ControlResponse) {
+    option (google.api.http) = {
+      post: "/api/yumiko/control/{device_id}"
+      body: "*"
+    };
+  }
+}
+
+//message AuthenticationRequest {
+//
+//}
+//
+//message AuthenticationResponse {
+//
+//}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  uint32 code = 1;
+  string message = 2;
+  string token = 3;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  uint32 code = 1;
+  string message = 2;
+  string token = 3;
+}
+
+message ControlRequest {
+  string device_id = 1;
+  string command = 2;
+  string value = 3;
+}
+
+message ControlResponse {
+ uint32 code = 1;
+ string message = 2;
+}

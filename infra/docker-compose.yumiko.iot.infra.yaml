@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  iot-mysql:
+    image: mysql:8
+    container_name: iot_mysql
+#ignore volume for current usage
+#    volumes:
+#      - /home/yumiko/Workspace/github.com/YumikoKawaii/monomiko-volumes
+    restart: unless-stopped
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: Yumiko1@
+      MYSQL_DATABASE: hlidskjalf
+      MYSQL_USER: yumiko
+      MYSQL_PASSWORD: Yumiko1@
