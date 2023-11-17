@@ -10,16 +10,21 @@ import (
 	"yumikokawaii.iot.com/config"
 	"yumikokawaii.iot.com/db"
 	"yumikokawaii.iot.com/pkg/auth"
+	"yumikokawaii.iot.com/pkg/devices"
+	"yumikokawaii.iot.com/pkg/mqttpublisher"
 	"yumikokawaii.iot.com/pkg/userinfo"
 )
 
 // Injectors from wire.go:
 
-func Initialize(cfg *config.AppConfig) ServiceServer {
+func Initialize(cfg *config.AppConfig) *ServiceServer {
 	gormDB := db.NewMySQLDB(cfg)
 	repository := userinfo.NewRepository(gormDB)
 	service := userinfo.NewService(repository)
+	devicesRepository := devices.NewRepository(gormDB)
+	mqttClient := mqttpublisher.NewMQTTClient(cfg)
+	devicesService := devices.NewService(devicesRepository, mqttClient)
 	jwtResolver := auth.NewJWTResolver(cfg)
-	serviceServer := NewServiceServer(service, jwtResolver)
+	serviceServer := NewServiceServer(service, devicesService, jwtResolver)
 	return serviceServer
 }

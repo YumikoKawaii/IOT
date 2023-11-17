@@ -20,6 +20,8 @@ type IOTServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Control(ctx context.Context, in *ControlRequest, opts ...grpc.CallOption) (*ControlResponse, error)
+	UpsertDevice(ctx context.Context, in *UpsertDeviceRequest, opts ...grpc.CallOption) (*UpsertDeviceResponse, error)
+	GetDevices(ctx context.Context, in *GetDevicesRequest, opts ...grpc.CallOption) (*GetDevicesResponse, error)
 }
 
 type iOTServiceClient struct {
@@ -57,6 +59,24 @@ func (c *iOTServiceClient) Control(ctx context.Context, in *ControlRequest, opts
 	return out, nil
 }
 
+func (c *iOTServiceClient) UpsertDevice(ctx context.Context, in *UpsertDeviceRequest, opts ...grpc.CallOption) (*UpsertDeviceResponse, error) {
+	out := new(UpsertDeviceResponse)
+	err := c.cc.Invoke(ctx, "/iot.api.v1.IOTService/UpsertDevice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iOTServiceClient) GetDevices(ctx context.Context, in *GetDevicesRequest, opts ...grpc.CallOption) (*GetDevicesResponse, error) {
+	out := new(GetDevicesResponse)
+	err := c.cc.Invoke(ctx, "/iot.api.v1.IOTService/GetDevices", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IOTServiceServer is the server API for IOTService service.
 // All implementations must embed UnimplementedIOTServiceServer
 // for forward compatibility
@@ -64,6 +84,8 @@ type IOTServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Control(context.Context, *ControlRequest) (*ControlResponse, error)
+	UpsertDevice(context.Context, *UpsertDeviceRequest) (*UpsertDeviceResponse, error)
+	GetDevices(context.Context, *GetDevicesRequest) (*GetDevicesResponse, error)
 	mustEmbedUnimplementedIOTServiceServer()
 }
 
@@ -79,6 +101,12 @@ func (UnimplementedIOTServiceServer) Login(context.Context, *LoginRequest) (*Log
 }
 func (UnimplementedIOTServiceServer) Control(context.Context, *ControlRequest) (*ControlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Control not implemented")
+}
+func (UnimplementedIOTServiceServer) UpsertDevice(context.Context, *UpsertDeviceRequest) (*UpsertDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertDevice not implemented")
+}
+func (UnimplementedIOTServiceServer) GetDevices(context.Context, *GetDevicesRequest) (*GetDevicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDevices not implemented")
 }
 func (UnimplementedIOTServiceServer) mustEmbedUnimplementedIOTServiceServer() {}
 
@@ -147,6 +175,42 @@ func _IOTService_Control_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IOTService_UpsertDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IOTServiceServer).UpsertDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/iot.api.v1.IOTService/UpsertDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IOTServiceServer).UpsertDevice(ctx, req.(*UpsertDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IOTService_GetDevices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IOTServiceServer).GetDevices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/iot.api.v1.IOTService/GetDevices",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IOTServiceServer).GetDevices(ctx, req.(*GetDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _IOTService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "iot.api.v1.IOTService",
 	HandlerType: (*IOTServiceServer)(nil),
@@ -162,6 +226,14 @@ var _IOTService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Control",
 			Handler:    _IOTService_Control_Handler,
+		},
+		{
+			MethodName: "UpsertDevice",
+			Handler:    _IOTService_UpsertDevice_Handler,
+		},
+		{
+			MethodName: "GetDevices",
+			Handler:    _IOTService_GetDevices_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

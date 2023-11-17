@@ -95,7 +95,7 @@ func (s *Server) Serve() error {
 	}
 
 	go func() {
-		log.Printf("Hlidskjalf - Serving on %s\n", s.cfg.HTTP)
+		log.Printf("[Yumiko] - Serving on %s\n", s.cfg.HTTP)
 		if err := httpServer.ListenAndServe(); err != nil {
 			errch <- err
 		}
@@ -119,9 +119,8 @@ func (s *Server) Serve() error {
 			defer cancel()
 			s.gRPC.GracefulStop()
 			if err := httpServer.Shutdown(ctx); err != nil {
-				log.Print("failed to stop server: %w", err)
+				log.Printf("failed to stop server: %w", err)
 			}
-			fmt.Print(1)
 		case err := <-errch:
 			return err
 		}

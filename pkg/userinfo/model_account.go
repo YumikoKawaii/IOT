@@ -11,6 +11,7 @@ const (
 )
 
 type Account struct {
+	Id        uint32
 	Username  string
 	Password  string
 	CreatedAt time.Time

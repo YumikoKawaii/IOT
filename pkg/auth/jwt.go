@@ -9,7 +9,7 @@ import (
 
 type JWTClaim struct {
 	jwt.StandardClaims
-	Information interface{}
+	Username string
 }
 
 type JWTResolver struct {
@@ -22,13 +22,13 @@ func NewJWTResolver(appConfig *config.AppConfig) JWTResolver {
 	}
 }
 
-func (j *JWTResolver) GenerateJWTToken(detail interface{}) (string, error) {
+func (j *JWTResolver) GenerateJWTToken(username string) (string, error) {
 
 	claims := JWTClaim{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(j.config.TokenDuration).Unix(),
 		},
-		Information: detail,
+		Username: username,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

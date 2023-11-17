@@ -38,6 +38,19 @@ service IOTService {
       body: "*"
     };
   }
+
+  rpc UpsertDevice(UpsertDeviceRequest) returns (UpsertDeviceResponse) {
+    option (google.api.http) = {
+      post: "/api/yumiko/devices"
+      body: "*"
+    };
+  }
+
+  rpc GetDevices(GetDevicesRequest) returns (GetDevicesResponse) {
+    option (google.api.http) = {
+      get: "/api/yumiko/devices/{username}"
+    };
+  }
 }
 
 //message AuthenticationRequest {
@@ -71,12 +84,40 @@ message LoginResponse {
 }
 
 message ControlRequest {
-  string device_id = 1;
-  string command = 2;
-  string value = 3;
+  uint32 device_id = 1;
+  string control_data = 2;
 }
 
 message ControlResponse {
  uint32 code = 1;
  string message = 2;
+}
+
+message GetDevicesRequest {
+  string username = 1;
+}
+
+message GetDevicesResponse {
+  uint32 code = 1;
+  string message = 2;
+
+  message Device {
+    uint32 id = 1;
+    string type = 2;
+    string code = 3;
+  }
+
+  repeated Device devices = 3;
+}
+
+message UpsertDeviceRequest {
+  uint32 id = 1;
+  string type = 2;
+  string code = 3;
+  string owner = 4;
+}
+
+message UpsertDeviceResponse {
+  uint32 code = 1;
+  string message = 2;
 }

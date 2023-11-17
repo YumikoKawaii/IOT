@@ -12,6 +12,8 @@ import (
 const (
 	RegisterMethodPattern = "Register"
 	LoginMethodPattern    = "Login"
+
+	UsernameKey = "username"
 )
 
 type AuthInterceptor struct {
@@ -27,14 +29,14 @@ func NewAuthInterceptor(resolver JWTResolver) AuthInterceptor {
 func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 
+		var claim *JWTClaim
 		if !strings.Contains(info.FullMethod, RegisterMethodPattern) && !strings.Contains(info.FullMethod, LoginMethodPattern) {
-			// currently, should ignore access management
-			_, err = i.authenticate(ctx)
+			claim, err = i.authenticate(ctx)
 			if err != nil {
 				return nil, err
 			}
 		}
-		return handler(ctx, req)
+		return handler(context.WithValue(ctx, UsernameKey, claim.Username), req)
 	}
 }
 
