@@ -1,14 +1,16 @@
 package userinfo
 
 import (
+	"errors"
 	"golang.org/x/xerrors"
+	"gorm.io/gorm"
 	"time"
 )
 
 type Service interface {
-	Register(string, string) error
+	Register(account *Account) error
 	Login(string, string) error
-	UpdateAccountInfo(Account) error
+	UpdateAccountInfo(*Account) error
 }
 
 type serviceImpl struct {
@@ -21,15 +23,20 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *serviceImpl) Register(username, password string) error {
-	account := &Account{
-		Username:  username,
-		Password:  HashString(password),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Status:    string(ACTIVE),
+func (s *serviceImpl) Register(account *Account) error {
+	if _, err := s.repository.GetAccountInfo(account.Username); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return s.repository.CreateAccount(&Account{
+				Username:  account.Username,
+				Password:  account.Password,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				Status:    string(ACTIVE),
+			})
+		}
+		return err
 	}
-	return s.repository.CreateAccount(account)
+	return xerrors.Errorf("username existed")
 }
 
 func (s *serviceImpl) Login(username, password string) error {
@@ -38,13 +45,13 @@ func (s *serviceImpl) Login(username, password string) error {
 	if err != nil {
 		return err
 	}
-	if account.Password != HashString(password) {
+	if account.Password != password {
 		return xerrors.New("error login: incorrect password")
 	}
 	return nil
 }
 
-func (s *serviceImpl) UpdateAccountInfo(account Account) error {
+func (s *serviceImpl) UpdateAccountInfo(account *Account) error {
 	account.UpdatedAt = time.Now()
-	return s.repository.UpdateAccount(&account)
+	return s.repository.UpdateAccount(account)
 }

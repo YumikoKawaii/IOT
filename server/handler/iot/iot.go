@@ -24,7 +24,7 @@ func NewServiceServer(userinfoService userinfo.Service, deviceService devices.Se
 }
 
 func (s *ServiceServer) Register(ctx context.Context, request *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	err := s.userinfoService.Register(request.Username, request.Password)
+	err := s.userinfoService.Register(ConvertFromRegisterRequestToRegisterModel(request))
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (s *ServiceServer) Register(ctx context.Context, request *pb.RegisterReques
 }
 
 func (s *ServiceServer) Login(ctx context.Context, request *pb.LoginRequest) (*pb.LoginResponse, error) {
-	err := s.userinfoService.Login(request.Username, request.Password)
+	err := s.userinfoService.Login(request.Username, HashString(request.Password))
 	if err != nil {
 		return nil, err
 	}
