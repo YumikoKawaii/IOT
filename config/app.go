@@ -26,7 +26,8 @@ type AppConfig struct {
 
 	MysqlCfg MysqlConfig `kong:"help:'Mysql config',embed"`
 
-	MqttCfg MQTTConfig `kong:"help:'mqtt config',embed"`
+	MqttPublisherCfg  MQTTPublisherConfig  `kong:"help:'mqtt publisher config',embed"`
+	MqttSubscriberCfg MQTTSubscriberConfig `kong:"help:'mqtt subscriber config',embed"`
 
 	HashKey string `name:"hash key" env:"HASH_KEY" default:"YumikoKawaii"`
 }

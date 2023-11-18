@@ -1,4 +1,4 @@
-package mqttpublisher
+package mqttresolver
 
 import "encoding/json"
 

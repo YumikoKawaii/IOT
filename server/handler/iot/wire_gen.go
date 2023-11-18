@@ -11,7 +11,7 @@ import (
 	"yumikokawaii.iot.com/db"
 	"yumikokawaii.iot.com/pkg/auth"
 	"yumikokawaii.iot.com/pkg/devices"
-	"yumikokawaii.iot.com/pkg/mqttpublisher"
+	"yumikokawaii.iot.com/pkg/mqttresolver"
 	"yumikokawaii.iot.com/pkg/userinfo"
 )
 
@@ -22,9 +22,10 @@ func Initialize(cfg *config.AppConfig) *ServiceServer {
 	repository := userinfo.NewRepository(gormDB)
 	service := userinfo.NewService(repository)
 	devicesRepository := devices.NewRepository(gormDB)
-	mqttClient := mqttpublisher.NewMQTTClient(cfg)
-	devicesService := devices.NewService(devicesRepository, mqttClient)
+	publisher := mqttresolver.NewPublisher(cfg)
+	devicesService := devices.NewService(devicesRepository, publisher)
 	jwtResolver := auth.NewJWTResolver(cfg)
-	serviceServer := NewServiceServer(service, devicesService, jwtResolver)
+	subscriber := mqttresolver.NewSubscriber(cfg)
+	serviceServer := NewServiceServer(service, devicesService, jwtResolver, subscriber)
 	return serviceServer
 }

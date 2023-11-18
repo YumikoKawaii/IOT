@@ -5,6 +5,7 @@ import (
 	pb "yumikokawaii.iot.com/pb"
 	"yumikokawaii.iot.com/pkg/auth"
 	"yumikokawaii.iot.com/pkg/devices"
+	"yumikokawaii.iot.com/pkg/mqttresolver"
 	"yumikokawaii.iot.com/pkg/userinfo"
 )
 
@@ -13,13 +14,16 @@ type ServiceServer struct {
 	userinfoService userinfo.Service
 	deviceService   devices.Service
 	jwtResolver     auth.JWTResolver
+	subscriber      *mqttresolver.Subscriber
 }
 
-func NewServiceServer(userinfoService userinfo.Service, deviceService devices.Service, resolver auth.JWTResolver) *ServiceServer {
+func NewServiceServer(userinfoService userinfo.Service, deviceService devices.Service, resolver auth.JWTResolver, subscriber *mqttresolver.Subscriber) *ServiceServer {
+	subscriber.Consume(deviceService.HandleStatMessage)
 	return &ServiceServer{
 		userinfoService: userinfoService,
 		deviceService:   deviceService,
 		jwtResolver:     resolver,
+		subscriber:      subscriber,
 	}
 }
 

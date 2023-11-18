@@ -4,25 +4,25 @@ import (
 	"encoding/json"
 	"golang.org/x/xerrors"
 	"reflect"
-	"yumikokawaii.iot.com/pkg/mqttpublisher"
+	"yumikokawaii.iot.com/pkg/mqttresolver"
 )
 
-func Deserialize(data string, structure interface{}) (mqttpublisher.Serializable, error) {
+func Deserialize(data string, structure interface{}) (mqttresolver.Serializable, error) {
 
 	message := reflect.New(reflect.TypeOf(structure)).Interface()
 	err := json.Unmarshal([]byte(data), message)
 	if err != nil {
 		return nil, xerrors.Errorf("incorrect data structure")
 	}
-	return message.(mqttpublisher.Serializable), nil
+	return message.(mqttresolver.Serializable), nil
 }
 
 func GetMessageStructureFromDeviceType(deviceType string) interface{} {
 	switch deviceType {
 	case string(FAN):
-		return mqttpublisher.FanControlMessage{}
+		return mqttresolver.FanControlMessage{}
 	case string(LED):
-		return mqttpublisher.LedControlMessage{}
+		return mqttresolver.LedControlMessage{}
 	}
 	return nil
 }

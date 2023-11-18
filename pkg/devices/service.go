@@ -2,9 +2,11 @@ package devices
 
 import (
 	"context"
+	"fmt"
+	mqttPkg "github.com/eclipse/paho.mqtt.golang"
 	"golang.org/x/xerrors"
 	"yumikokawaii.iot.com/pkg/auth"
-	"yumikokawaii.iot.com/pkg/mqttpublisher"
+	"yumikokawaii.iot.com/pkg/mqttresolver"
 )
 
 type Service interface {
@@ -12,17 +14,22 @@ type Service interface {
 	GetDevicesByOwner(string) ([]Device, error)
 	GetDeviceById(uint32) (*Device, error)
 	ControlDevice(context.Context, uint32, string) error
+
+	UpsertDeviceStat(*DeviceStat) error
+	GetDeviceStatById(uint32) (*DeviceStat, error)
+	HandleStatMessage(mqttPkg.Message) error
 }
 
 type serviceImpl struct {
-	repo       Repository
-	mqttClient *mqttpublisher.MQTTClient
+	repo      Repository
+	publisher *mqttresolver.Publisher
 }
 
-func NewService(repository Repository, client *mqttpublisher.MQTTClient) Service {
+func NewService(repository Repository, publisher *mqttresolver.Publisher) Service {
+
 	return &serviceImpl{
-		repo:       repository,
-		mqttClient: client,
+		repo:      repository,
+		publisher: publisher,
 	}
 }
 
@@ -51,5 +58,18 @@ func (s *serviceImpl) ControlDevice(ctx context.Context, deviceId uint32, contro
 	if err != nil {
 		return err
 	}
-	return s.mqttClient.Send(device.Topic, message)
+	return s.publisher.Send(device.Topic, message)
+}
+
+func (s *serviceImpl) UpsertDeviceStat(stat *DeviceStat) error {
+	return s.repo.UpsertDeviceStat(stat)
+}
+
+func (s *serviceImpl) GetDeviceStatById(id uint32) (*DeviceStat, error) {
+	return s.repo.GetDeviceStatById(id)
+}
+
+func (s *serviceImpl) HandleStatMessage(message mqttPkg.Message) error {
+	fmt.Println(message)
+	return nil
 }

@@ -1,4 +1,4 @@
-package mqttpublisher
+package mqttresolver
 
 import (
 	mqttPkg "github.com/eclipse/paho.mqtt.golang"
@@ -6,29 +6,29 @@ import (
 	"yumikokawaii.iot.com/config"
 )
 
-type MQTTClient struct {
+type Publisher struct {
 	client mqttPkg.Client
 	qos    byte
 }
 
-func NewMQTTClient(config *config.AppConfig) *MQTTClient {
+func NewPublisher(config *config.AppConfig) *Publisher {
 
-	mqttCfg := config.MqttCfg
+	mqttCfg := config.MqttPublisherCfg
 	clientOpts := mqttPkg.NewClientOptions()
-	clientOpts.AddBroker(mqttCfg.Broker)
-	clientOpts.SetClientID(mqttCfg.ClientID)
+	clientOpts.AddBroker(mqttCfg.PBroker)
+	clientOpts.SetClientID(mqttCfg.PClientID)
 	client := mqttPkg.NewClient(clientOpts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatal(token.Error())
 	}
-	log.Println("[MQTT Client] - Connected!")
-	return &MQTTClient{
+	log.Println("[MQTT Publisher] - Connected!")
+	return &Publisher{
 		client: client,
-		qos:    mqttCfg.QOS,
+		qos:    mqttCfg.PQOS,
 	}
 }
 
-func (m *MQTTClient) Send(topic string, data Serializable) error {
+func (m *Publisher) Send(topic string, data Serializable) error {
 	if token := m.client.Publish(topic, m.qos, false, data.ToBytes()); token.Wait() && token.Error() != nil {
 		log.Printf("[MQTT Client] - Error sending message to MQTT server: %v", token.Error())
 		return token.Error()
