@@ -20,7 +20,6 @@ func ConvertUpsertDeviceRequestToDeviceModel(request *pb.UpsertDeviceRequest) *d
 	return &devices.Device{
 		Type:  request.Type,
 		Code:  request.Code,
-		Owner: request.Owner,
 		Topic: fmt.Sprintf("%s%s", topicPrefix, uuid.New()),
 	}
 }

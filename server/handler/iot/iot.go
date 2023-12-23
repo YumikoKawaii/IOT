@@ -2,6 +2,7 @@ package iot
 
 import (
 	"context"
+	"golang.org/x/xerrors"
 	pb "yumikokawaii.iot.com/pb"
 	"yumikokawaii.iot.com/pkg/auth"
 	"yumikokawaii.iot.com/pkg/devices"
@@ -64,7 +65,16 @@ func (s *ServiceServer) Control(ctx context.Context, request *pb.ControlRequest)
 }
 
 func (s *ServiceServer) UpsertDevice(ctx context.Context, request *pb.UpsertDeviceRequest) (*pb.UpsertDeviceResponse, error) {
-	if err := s.deviceService.UpsertDevice(ConvertUpsertDeviceRequestToDeviceModel(request)); err != nil {
+
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		return nil, xerrors.Errorf("...")
+	}
+
+	device := ConvertUpsertDeviceRequestToDeviceModel(request)
+	device.Owner = username
+
+	if err := s.deviceService.UpsertDevice(device); err != nil {
 		return nil, err
 	}
 	return &pb.UpsertDeviceResponse{
@@ -74,7 +84,13 @@ func (s *ServiceServer) UpsertDevice(ctx context.Context, request *pb.UpsertDevi
 }
 
 func (s *ServiceServer) GetDevices(ctx context.Context, request *pb.GetDevicesRequest) (*pb.GetDevicesResponse, error) {
-	deviceModels, err := s.deviceService.GetDevicesByOwner(request.Username)
+
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		return nil, xerrors.Errorf("...")
+	}
+
+	deviceModels, err := s.deviceService.GetDevicesByOwner(username)
 	if err != nil {
 		return nil, err
 	}

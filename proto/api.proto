@@ -48,7 +48,7 @@ service IOTService {
 
   rpc GetDevices(GetDevicesRequest) returns (GetDevicesResponse) {
     option (google.api.http) = {
-      get: "/api/yumiko/devices/{username}"
+      get: "/api/yumiko/devices"
     };
   }
 }
@@ -94,7 +94,6 @@ message ControlResponse {
 }
 
 message GetDevicesRequest {
-  string username = 1;
 }
 
 message GetDevicesResponse {
@@ -114,7 +113,6 @@ message UpsertDeviceRequest {
   uint32 id = 1;
   string type = 2;
   string code = 3;
-  string owner = 4;
 }
 
 message UpsertDeviceResponse {

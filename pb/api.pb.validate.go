@@ -462,8 +462,6 @@ func (m *GetDevicesRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Username
-
 	return nil
 }
 
@@ -622,8 +620,6 @@ func (m *UpsertDeviceRequest) Validate() error {
 	// no validation rules for Type
 
 	// no validation rules for Code
-
-	// no validation rules for Owner
 
 	return nil
 }
